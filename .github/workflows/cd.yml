@@ -1,0 +1,43 @@
+name: CD - Deploy to Hugging Face Spaces
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-huggingface:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install make
+        run: sudo apt-get update && sudo apt-get install -y make
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: make install
+
+      - name: Train model
+        run: make train
+
+      - name: Evaluate model
+        run: python evaluate.py
+
+      - name: Deploy to Hugging Face Spaces
+        env:
+          HF: ${{ secrets.HF_TOKEN }}
+        run: |
+          pip install -U "huggingface_hub[cli]"
+          huggingface-cli upload eslunap/Drug-Classification ./App --repo-type=space --commit-message="Sync App files"
+          huggingface-cli upload eslunap/Drug-Classification ./Model /Model --repo-type=space --commit-message="Sync Model"
+          huggingface-cli upload eslunap/Drug-Classification ./Results /Metrics --repo-type=space --commit-message="Sync Results"

@@ -1,0 +1,56 @@
+name: CI - Train and Evaluate Model
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  train-evaluate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install make
+        run: sudo apt-get update && sudo apt-get install -y make
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: make install
+
+      - name: Format code
+        run: make format
+
+      - name: Train model
+        run: make train
+
+      - name: Evaluate model and generate report
+        run: |
+          python evaluate.py
+          echo "## Model Metrics" > report.md
+          cat ./Results/metrics.txt >> report.md
+          echo "" >> report.md
+          echo "## Confusion Matrix Plot" >> report.md
+          echo "![Confusion Matrix](./Results/model_results.png)" >> report.md
+
+      - name: Upload model and results as artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: model-results
+          path: |
+            Model/
+            Results/
+            report.md
