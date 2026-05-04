@@ -5,7 +5,7 @@ from pathlib import Path
 
 # Ruta del modelo.
 # En Hugging Face, la carpeta Model quedará al mismo nivel que App.
-MODEL_PATH = Path(__file__).resolve().parent.parent / "Model" / "model.pkl"
+MODEL_PATH = Path(__file__).resolve().parent / "Model" / "model.pkl"
 
 model = joblib.load(MODEL_PATH)
 
