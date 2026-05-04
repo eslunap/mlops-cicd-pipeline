@@ -10,10 +10,10 @@ train:
 eval:
 	python evaluate.py
 	echo "## Model Metrics" > report.md
-	type .\Results\metrics.txt >> report.md
-	echo. >> report.md
-	echo ## Confusion Matrix Plot >> report.md
-	echo ![Confusion Matrix](./Results/model_results.png) >> report.md
+	cat ./Results/metrics.txt >> report.md
+	echo "" >> report.md
+	echo "## Confusion Matrix Plot" >> report.md
+	echo "![Confusion Matrix](./Results/model_results.png)" >> report.md
 
 update-branch:
 	git config --global user.name "$(USER_NAME)"
@@ -33,4 +33,4 @@ push-hub:
 
 deploy: hf-login push-hub
 
-all: install format train eval
+all: install format train eval deploy
